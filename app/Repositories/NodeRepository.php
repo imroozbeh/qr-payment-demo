@@ -1,0 +1,51 @@
+<?php
+
+namespace App\Repositories;
+
+use Carbon\Carbon;
+use Illuminate\Support\Facades\DB;
+use Milyoonex\Repositories\BaseRepository;
+
+class NodeRepository extends BaseRepository
+{
+    public function getCurrency($network, $contract)
+    {
+        $network = $network->load(['currencies' => function ($query) use ($contract) {
+            $query->where('currency_network.contract', $contract);
+        }]);
+        return $network->currencies->first();
+    }
+
+    public function increaseWalletBalance($wallet, $network)
+    {
+        DB::beginTransaction();
+
+        $deposits = $wallet->deposits()->where('deposited_at', null)->where('status', 1)->get();
+
+        $sum = '0';
+
+        foreach ($deposits->where('deposited_at', null) as $deposit) {
+            $sum = addAmount($sum, $deposit->amount);
+        }
+
+        if ($sum >= $wallet->currency->min_deposit) {
+            $wallet->update([
+                'balance' => addAmount($wallet->balance, $sum)
+            ]);
+
+            foreach ($deposits as $deposit) {
+                $deposit->update([
+                    'deposited_at' => Carbon::now()->toDateTimeString()
+                ]);
+            }
+        }
+
+        foreach ($deposits as $deposit) {
+            $deposit->update([
+                'confirmed_at' => $deposit->confirmation_count >= $network->withdrawal_confirmation ? Carbon::now()->toDateTimeString() : null
+            ]);
+        }
+
+        DB::commit();
+    }
+}
