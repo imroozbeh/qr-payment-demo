@@ -55,14 +55,15 @@ class BlockListen extends Command
 
         // 12272161 cache
 
-        var_dump($lastProcessedBlock);
+        var_dump('last_block: ' . $lastProcessedBlock);
 
         do {
+            var_dump('call api: eth_blockNumber()' . ' || ' . Carbon::now()->toDateTimeString());
             $lastBlock = NodeApi::eth_blockNumber();
 
             if($lastBlock['status'] == 200) {
                 //$lastBlockNumber = hexdec($lastBlock['body']['result']);
-                $lastBlockNumber = 12272162;
+                $lastBlockNumber = 12272182;
 
                 //dd($lastBlockNumber);
 

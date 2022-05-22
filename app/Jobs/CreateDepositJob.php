@@ -69,8 +69,6 @@ class CreateDepositJob extends Job
                     ];
 
                     NodeRepositoryFacade::forceStoreRecord('Deposit', $data);
-
-                    NodeRepositoryFacade::increaseWalletBalance($wallet, $network);
                 }
             }
         }

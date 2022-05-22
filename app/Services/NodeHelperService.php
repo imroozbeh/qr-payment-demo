@@ -4,56 +4,50 @@ namespace App\Services;
 
 use App\Facades\NodeApi;
 use App\Facades\NodeRepositoryFacade;
+use Carbon\Carbon;
 
 class NodeHelperService
 {
     public function getBlockTransactions($currentBlockNumber)
     {
+        var_dump('call api: eth_getBlockByNumber()' . ' || ' . Carbon::now()->toDateTimeString());
         $currentBlock = NodeApi::eth_getBlockByNumber('0x' . dechex($currentBlockNumber), true);
 
         $transactions = [];
 
         if($currentBlock['status'] == 200) {
             $currentBlockTransactions = $currentBlock['body']['result']['transactions'];
-            //dd($currentBlockTransactions);
 
-            $lastBlock = NodeApi::eth_blockNumber();
-            if($lastBlock['status'] == 200) {
-                $lastBlockNumber = hexdec($lastBlock['body']['result']);
-
-                foreach ($currentBlockTransactions as $transaction) {
-                    // eth
-                    if($transaction['input'] == '0x') {
+            foreach ($currentBlockTransactions as $transaction) {
+                // eth
+                if($transaction['input'] == '0x') {
+                    $data = [
+                        'block'        => hexdec($transaction['blockNumber']),
+                        'contract'     => 'eth',
+                        'tx'           => $transaction['hash'],
+                        'from'         => $transaction['from'],
+                        'to'           => $transaction['to'],
+                        'value'        => substr($transaction['value'], 2),
+                    ];
+                    $address = NodeRepositoryFacade::getRecord('Address', ['address' => $data['to']]);
+                    if($address) {
+                        array_push($transactions, $data);
+                    }
+                }
+                // eth tokens
+                else {
+                    if(substr($transaction['input'], 0, 10) == '0xa9059cbb') {
                         $data = [
                             'block'        => hexdec($transaction['blockNumber']),
-                            'contract'     => 'eth',
+                            'contract'     => $transaction['to'],
                             'tx'           => $transaction['hash'],
                             'from'         => $transaction['from'],
-                            'to'           => $transaction['to'],
-                            'value'        => substr($transaction['value'], 2),
-                            'confirmation' => $lastBlockNumber - hexdec($transaction['blockNumber']),
+                            'to'           => '0x' . ltrim(substr($transaction['input'], 10, 64), '0'),
+                            'value'        => substr($transaction['input'], 74),
                         ];
                         $address = NodeRepositoryFacade::getRecord('Address', ['address' => $data['to']]);
                         if($address) {
                             array_push($transactions, $data);
-                        }
-                    }
-                    // eth tokens
-                    else {
-                        if(substr($transaction['input'], 0, 10) == '0xa9059cbb') {
-                            $data = [
-                                'block'        => hexdec($transaction['blockNumber']),
-                                'contract'     => $transaction['to'],
-                                'tx'           => $transaction['hash'],
-                                'from'         => $transaction['from'],
-                                'to'           => '0x' . ltrim(substr($transaction['input'], 10, 64), '0'),
-                                'value'        => substr($transaction['input'], 74),
-                                'confirmation' => $lastBlockNumber - hexdec($transaction['blockNumber']),
-                            ];
-                            $address = NodeRepositoryFacade::getRecord('Address', ['address' => $data['to']]);
-                            if($address) {
-                                array_push($transactions, $data);
-                            }
                         }
                     }
                 }

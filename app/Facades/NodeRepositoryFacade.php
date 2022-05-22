@@ -25,6 +25,7 @@ use Milyoonex\Facades\BaseFacade;
  * @method static restoreRecords($model, $data)
  * @method static getCurrency($network, $contract)
  * @method static increaseWalletBalance($wallet, $network)
+ * @method static getNotConfirmedDeposits()
  *
  * @see \App\Repositories\NodeRepository
  */
