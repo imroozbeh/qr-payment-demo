@@ -31,7 +31,7 @@ class ConfirmDepositJob extends Job
      */
     public function handle()
     {
-        var_dump('current_block: ' . $this->currentBlockNumber);
+        //var_dump('current_block: ' . $this->currentBlockNumber);
 
         $deposits = NodeRepositoryFacade::getNotConfirmedDeposits();
 
@@ -47,7 +47,7 @@ class ConfirmDepositJob extends Job
                 if ($confirmation >= $network->deposit_confirmation) {
                     // status update
                     if ($deposit->status == null) {
-                        var_dump('call api: eth_getTransactionReceipt()' . ' || ' . Carbon::now()->toDateTimeString());
+                        //var_dump('call api: eth_getTransactionReceipt()' . ' || ' . Carbon::now()->toDateTimeString());
                         $receipt = NodeApi::eth_getTransactionReceipt($deposit->tx);
 
                         if (hexdec($receipt['body']['result']['status']) == 1) {

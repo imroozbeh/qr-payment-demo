@@ -10,7 +10,7 @@ class NodeHelperService
 {
     public function getBlockTransactions($currentBlockNumber)
     {
-        var_dump('call api: eth_getBlockByNumber()' . ' || ' . Carbon::now()->toDateTimeString());
+        //var_dump('call api: eth_getBlockByNumber()' . ' || ' . Carbon::now()->toDateTimeString());
         $currentBlock = NodeApi::eth_getBlockByNumber('0x' . dechex($currentBlockNumber), true);
 
         $transactions = [];

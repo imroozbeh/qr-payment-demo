@@ -43,32 +43,19 @@ class BlockListen extends Command
      */
     public function handle()
     {
-        // pending 0x685f84e54dfd5086082bd98c09b8fc3bd7f14bfedf492c96a0c609ee37b7d1b9
-        // failed 0x05c7797d3ddc82b59a4364aed6382f59f23fa25c19f4aed5b29458d12fc68cfd
-        // success 0xa23b6df60b00ca897cf464ee1c8a5f1f7e070db04bcf292400fc985bfda4c967
-        //$receipt = NodeApi::eth_getTransactionReceipt('0x685f84e54dfd5086082bd98c09b8fc3bd7f14bfedf492c96a0c609ee37b7d1b9');
-        //dd($receipt);
-
         $lastProcessedBlock = Cache::rememberForever('lastProcessedBlock', function () {
             return 0;
         });
 
-        // 12272161 cache
-
-        var_dump('last_block: ' . $lastProcessedBlock);
-
         do {
-            var_dump('call api: eth_blockNumber()' . ' || ' . Carbon::now()->toDateTimeString());
             $lastBlock = NodeApi::eth_blockNumber();
 
             if($lastBlock['status'] == 200) {
-                //$lastBlockNumber = hexdec($lastBlock['body']['result']);
-                $lastBlockNumber = 12272182;
-
-                //dd($lastBlockNumber);
+                $lastBlockNumber = hexdec($lastBlock['body']['result']);
 
                 if($lastBlockNumber > $lastProcessedBlock) {
                     for ($i = $lastProcessedBlock + 1; $i <= $lastBlockNumber; $i++) {
+                        //var_dump('block_number: ' . $i);
                         dispatch(new CreateDepositJob($i));
                         dispatch(new ConfirmDepositJob($i));
                         Cache::put('lastProcessedBlock', $i);
