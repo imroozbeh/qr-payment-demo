@@ -39,4 +39,4 @@ The Lumen framework is open-sourced software licensed under the [MIT license](ht
 - Environment variables
   | # | Variables | Description |
   | :--- | :--- | :--- |
-  | 1 | FULLNODE_API_PROVIDER=getblock <br /> GETBLOCK_X_API_KEY=5c2dde02-ece0-40d1-be13-9f826a7ad7c6 <br /> GTBLOCK_ENDPOINT=https://eth.getblock.io/testnet/ <br /> GETBLOCK_ID=getblock.io | /config/node-api.php <br /> OR https://eth.getblock.io/mainnet/ for Main Network of Blockchain |
+  | 1 | FULLNODE_API_PROVIDER=getblock <br /> GETBLOCK_X_API_KEY=5c2dde02-ece0-40d1-be13-9f826a7ad7c6 <br /> GTBLOCK_ENDPOINT=https://eth.getblock.io/testnet/ <br /> GETBLOCK_ID=getblock.io | - Config File: /config/node-api.php <br /> - https://eth.getblock.io/mainnet/ for Main Network of Blockchain |
