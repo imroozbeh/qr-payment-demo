@@ -43,7 +43,7 @@ class BlockListen extends Command
      */
     public function handle()
     {
-        $lastProcessedBlock = Cache::rememberForever('lastProcessedBlock', function () {
+        $ethLastProcessedBlock = Cache::rememberForever('ethLastProcessedBlock', function () {
             return 0;
         });
 
@@ -53,14 +53,14 @@ class BlockListen extends Command
             if($lastBlock['status'] == 200) {
                 $lastBlockNumber = hexdec($lastBlock['body']['result']);
 
-                if($lastBlockNumber > $lastProcessedBlock) {
-                    for ($i = $lastProcessedBlock + 1; $i <= $lastBlockNumber; $i++) {
+                if($lastBlockNumber > $ethLastProcessedBlock) {
+                    for ($i = $ethLastProcessedBlock+ 1; $i <= $lastBlockNumber; $i++) {
                         //var_dump('block_number: ' . $i);
                         dispatch(new CreateDepositJob($i));
                         dispatch(new ConfirmDepositJob($i));
-                        Cache::put('lastProcessedBlock', $i);
+                        Cache::put('ethLastProcessedBlock', $i);
                     }
-                    $lastProcessedBlock = $lastBlockNumber;
+                    $ethLastProcessedBlock = $lastBlockNumber;
                 }
             }
 
