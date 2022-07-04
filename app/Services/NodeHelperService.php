@@ -58,7 +58,7 @@ class NodeHelperService
 
     public function bcDecodeValue($hex, $decimal = 18)
     {
-        $num = $this->bchexdec($hex);
+        $num = $this->bchexdec($hex,$decimal);
         $num = str_pad($num, $decimal, 0, STR_PAD_LEFT);
 
         $dec = substr($num, -$decimal);
@@ -77,7 +77,7 @@ class NodeHelperService
         return $final;
     }
 
-    private function bchexdec($hex)
+    private function bchexdec($hex,$decimal = 18)
     {
         $remainingDigits = substr($hex, 0, -1);
         $lastDigitToDecimal = \hexdec(substr($hex, -1));
@@ -86,6 +86,6 @@ class NodeHelperService
             return $lastDigitToDecimal;
         }
 
-        return addAmount(mulAmount(16, $this->bchexdec($remainingDigits)), $lastDigitToDecimal, 0);
+        return addAmount(mulAmount(16, $this->bchexdec($remainingDigits,$decimal)), $lastDigitToDecimal, $decimal);
     }
 }

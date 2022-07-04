@@ -32,43 +32,33 @@ class CreateDepositJob extends Job
     {
         $transactions = NodeHelper::getBlockTransactions($this->currentBlockNumber);
 
-        foreach($transactions as $transaction) {
+        foreach ($transactions as $transaction) {
             $checkDepositExist = NodeRepositoryFacade::getRecord('Deposit', [
                 'address' => $transaction['to'],
-                'tx'      => $transaction['tx'],
+                'tx' => $transaction['tx'],
             ]);
-            if(! empty($checkDepositExist)) {
+            if (!empty($checkDepositExist)) {
                 break;
             }
             $address = NodeRepositoryFacade::getRecord('Address', [
                 'address' => $transaction['to'],
             ]);
-            if($address) {
+            if ($address) {
 
-                    $data = [
-                        'address'            => $transaction['to'],
-                        'contract'           => $transaction['contract'],
-                        'tx'                 => $transaction['tx'],
-                        'block_number'       => $transaction['block'],
-                        'amount'             => NodeHelper::bcDecodeValue($transaction['value']),
-                        'deposited_at'       => Carbon::now()
-                    ];
+                $data = [
+                    'address' => $transaction['to'],
+                    'contract' => $transaction['contract'],
+                    'tx' => $transaction['tx'],
+                    'block_number' => $transaction['block'],
+                    'amount' => NodeHelper::bcDecodeValue($transaction['value'], 18),
+                    'deposited_at' => Carbon::now()
+                ];
 
-                    NodeRepositoryFacade::forceStoreRecord('Deposit', $data);
+                NodeRepositoryFacade::forceStoreRecord('Deposit', $data);
 
             }
         }
     }
 
-    private function bchexdec($hex)
-    {
-        $remainingDigits = substr($hex, 0, -1);
-        $lastDigitToDecimal = \hexdec(substr($hex, -1));
 
-        if (strlen($remainingDigits) === 0) {
-            return $lastDigitToDecimal;
-        }
-
-        return addAmount(mulAmount(16, $this->bchexdec($remainingDigits)), $lastDigitToDecimal, 0);
-    }
 }
