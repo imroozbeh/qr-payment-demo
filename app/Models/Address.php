@@ -2,9 +2,9 @@
 
 namespace App\Models;
 
-use Milyoonex\Models\Address as AddressModel;
+use Illuminate\Database\Eloquent\Model;
 
-class Address extends AddressModel
+class Address extends Model
 {
-    //
+
 }

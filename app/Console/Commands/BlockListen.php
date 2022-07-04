@@ -43,9 +43,8 @@ class BlockListen extends Command
      */
     public function handle()
     {
-        $ethLastProcessedBlock = Cache::rememberForever('ethLastProcessedBlock', function () {
-            return 0;
-        });
+        $ethLastProcessed = NodeApi::eth_blockNumber();
+        $ethLastProcessedBlock = hexdec($ethLastProcessed['body']['result']) - 1;
 
         do {
             $lastBlock = NodeApi::eth_blockNumber();
@@ -54,16 +53,16 @@ class BlockListen extends Command
                 $lastBlockNumber = hexdec($lastBlock['body']['result']);
 
                 if($lastBlockNumber > $ethLastProcessedBlock) {
-                    for ($i = $ethLastProcessedBlock+ 1; $i <= $lastBlockNumber; $i++) {
+                    for ($i = $ethLastProcessedBlock + 1; $i <= $lastBlockNumber; $i++) {
                         //var_dump('block_number: ' . $i);
                         dispatch(new CreateDepositJob($i));
-                        dispatch(new ConfirmDepositJob($i));
-                        Cache::put('ethLastProcessedBlock', $i);
+                        var_dump($i);
                     }
                     $ethLastProcessedBlock = $lastBlockNumber;
                 }
             }
 
         } while (true);
+
     }
 }

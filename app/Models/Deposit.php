@@ -2,9 +2,9 @@
 
 namespace App\Models;
 
-use Milyoonex\Models\Deposit as DepositModel;
+use Illuminate\Database\Eloquent\Model;
 
-class Deposit extends DepositModel
+class Deposit extends Model
 {
-    //
+
 }

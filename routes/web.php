@@ -13,6 +13,7 @@
 |
 */
 
-$router->get('/', function () use ($router) {
-    return $router->app->version();
-});
+
+$router->get('generate', ['uses' => 'AddressController@generate']);
+$router->get('address-list', ['uses' => 'AddressController@addressList']);
+$router->get('address-deposits/{address}', ['uses' => 'AddressController@addressDeposits']);

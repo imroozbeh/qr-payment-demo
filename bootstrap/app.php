@@ -97,6 +97,7 @@ $app->register(App\Providers\AppServiceProvider::class);
 // $app->register(App\Providers\EventServiceProvider::class);
 
 $app->register(Milyoonex\Providers\MilyoonexPkgServiceProvider::class);
+$app->register(HdWallet\Src\HDWalletServiceProvider::class);
 
 /*
 |--------------------------------------------------------------------------

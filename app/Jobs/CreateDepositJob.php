@@ -32,8 +32,6 @@ class CreateDepositJob extends Job
     {
         $transactions = NodeHelper::getBlockTransactions($this->currentBlockNumber);
 
-        $network = NodeRepositoryFacade::getRecord('Network', ['name' => 'ERC20']);
-
         foreach($transactions as $transaction) {
             $checkDepositExist = NodeRepositoryFacade::getRecord('Deposit', [
                 'address' => $transaction['to'],
@@ -44,33 +42,33 @@ class CreateDepositJob extends Job
             }
             $address = NodeRepositoryFacade::getRecord('Address', [
                 'address' => $transaction['to'],
-                'address_type_id' => $network->address_type_id
             ]);
             if($address) {
-                $currency = NodeRepositoryFacade::getCurrency($network, $transaction['contract']);
-
-                if ($currency) {
-                    $wallet = NodeRepositoryFacade::getRecord('Wallet', [
-                        'user_id' => $address->user_id,
-                        'currency_id' => $currency->id
-                    ]);
 
                     $data = [
-                        'type'               => 'blockchain',
-                        'wallet_id'          => $wallet->id,
-                        'network_id'         => $network->id,
                         'address'            => $transaction['to'],
                         'contract'           => $transaction['contract'],
                         'tx'                 => $transaction['tx'],
                         'block_number'       => $transaction['block'],
-                        'status'             => null,
-                        'amount'             => NodeHelper::bcDecodeValue($transaction['value'], $currency->pivot->decimal),
-                        'confirmation_count' => 0,
+                        'amount'             => NodeHelper::bcDecodeValue($transaction['value']),
+                        'deposited_at'       => Carbon::now()
                     ];
 
                     NodeRepositoryFacade::forceStoreRecord('Deposit', $data);
-                }
+
             }
         }
+    }
+
+    private function bchexdec($hex)
+    {
+        $remainingDigits = substr($hex, 0, -1);
+        $lastDigitToDecimal = \hexdec(substr($hex, -1));
+
+        if (strlen($remainingDigits) === 0) {
+            return $lastDigitToDecimal;
+        }
+
+        return addAmount(mulAmount(16, $this->bchexdec($remainingDigits)), $lastDigitToDecimal, 0);
     }
 }
